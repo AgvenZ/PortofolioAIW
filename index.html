@@ -596,8 +596,8 @@
         .mobile-theme-toggle {
             display: none;
             position: fixed;
-            top: calc(22px + env(safe-area-inset-top));
-            right: calc(24px + env(safe-area-inset-right));
+            top: 22px;
+            left: 0;
             z-index: 9999;
             width: 40px;
             height: 40px;
@@ -611,26 +611,15 @@
             justify-content: center;
             cursor: pointer;
             box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+            transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
             font-size: 0.95rem;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(0) translateZ(0);
-            will-change: transform, opacity;
-        }
-        .mobile-theme-toggle.ready {
             opacity: 1;
             visibility: visible;
-            transform: translateX(0) translateZ(0);
-        }
-        html.page-loading .mobile-theme-toggle,
-        html.page-loading .mobile-theme-toggle.ready {
-            opacity: 1 !important;
-            visibility: visible !important;
-            transform: translateX(0) translateZ(0) !important;
-            transition: none !important;
+            transform: translateZ(0);
+            will-change: transform, left, top;
+            pointer-events: auto;
         }
         .mobile-theme-toggle:hover {
             transform: rotate(20deg) translateZ(0);
@@ -792,8 +781,6 @@
                 font-size: 0.45rem;
             }
             .mobile-theme-toggle {
-                top: calc(20px + env(safe-area-inset-top));
-                right: calc(20px + env(safe-area-inset-right));
                 width: 36px;
                 height: 36px;
                 font-size: 0.85rem;
@@ -815,8 +802,6 @@
                 display: none;
             }
             .mobile-theme-toggle {
-                top: calc(18px + env(safe-area-inset-top));
-                right: calc(16px + env(safe-area-inset-right));
                 width: 32px;
                 height: 32px;
                 font-size: 0.75rem;
@@ -2927,29 +2912,78 @@
                 themeToggle.addEventListener('click', toggleTheme);
                 mobileThemeToggle.addEventListener('click', toggleTheme);
 
-                // MOBILE THEME TOGGLE: trigger .ready + force reflow agar tidak terpotong di kanan
+                // MOBILE THEME TOGGLE: POSISI DIPAKSA MENGGUNAKAN PIXEL LEFT + TOP BERDASARKAN window.innerWidth
+                // Ini menghindari bug layout-viewport vs visual-viewport yang bikin kanan terpotong sebelum scroll
                 if (window.innerWidth <= 768) {
-                    const forceShowToggle = () => {
-                        mobileThemeToggle.classList.add('ready');
-                        // Force reflow + repaint
-                        void mobileThemeToggle.getBoundingClientRect();
-                        mobileThemeToggle.style.setProperty('display', 'flex', 'important');
-                        const rightPx = window.innerWidth > 480 ? 24 : (window.innerWidth > 380 ? 20 : 16);
-                        const topPx   = window.innerWidth > 480 ? 22 : (window.innerWidth > 380 ? 20 : 18);
-                        mobileThemeToggle.style.setProperty('right',  `calc(${rightPx}px + env(safe-area-inset-right))`);
-                        mobileThemeToggle.style.setProperty('top',    `calc(${topPx}px   + env(safe-area-inset-top))`);
-                        void mobileThemeToggle.offsetLeft;
+                    const positionToggle = () => {
+                        try {
+                            // Pastikan sudah flex dulu (karena display:none di desktop)
+                            mobileThemeToggle.style.setProperty('display', 'flex', 'important');
+                            // Clear right property supaya tidak bentrok
+                            mobileThemeToggle.style.removeProperty('right');
+
+                            const w = window.innerWidth;
+                            const btnW = mobileThemeToggle.offsetWidth || 40;
+                            const btnH = mobileThemeToggle.offsetHeight || 40;
+                            // Safe area: gunakan getComputedStyle untuk nilai aktual dari CSS env()
+                            let sar = 0, sat = 0;
+                            try {
+                                const probe = document.createElement('div');
+                                probe.style.cssText = 'position:fixed;top:env(safe-area-inset-top);right:env(safe-area-inset-right);visibility:hidden;pointer-events:none;width:0;height:0;';
+                                document.body.appendChild(probe);
+                                const pr = probe.getBoundingClientRect();
+                                sat = pr.top;
+                                sar = w - pr.left;
+                                probe.remove();
+                            } catch (_) { /* noop */ }
+
+                            // Gap sesuai breakpoint (sama dengan setting CSS sebelumnya, tapi pixel)
+                            let gapRight = 24;
+                            let gapTop = 22;
+                            if (w <= 380)       { gapRight = 16; gapTop = 18; }
+                            else if (w <= 480)  { gapRight = 20; gapTop = 20; }
+
+                            // Hitung LEFT secara eksplisit dari window.innerWidth (visual viewport)
+                            // Jangan andalkan 'right: XXpx' yang dihitung relatif ke layout viewport buggy
+                            const leftPx = Math.max(4, w - btnW - gapRight - sar);
+                            const topPx  = Math.max(4, gapTop + sat);
+
+                            // Set inline style secara langsung (bukan calc), browser tidak bisa salah hitung.
+                            mobileThemeToggle.style.left = leftPx + 'px';
+                            mobileThemeToggle.style.top  = topPx + 'px';
+
+                            // Force reflow
+                            void mobileThemeToggle.getBoundingClientRect();
+                        } catch (e) { console.warn('[toggle-pos]', e); }
                     };
-                    requestAnimationFrame(forceShowToggle);
-                    setTimeout(forceShowToggle, 50);
-                    setTimeout(forceShowToggle, 500);
-                    setTimeout(forceShowToggle, 1500);
-                    // Trigger ulang saat preloader selesai hilang
-                    setTimeout(() => {
-                        mobileThemeToggle.classList.remove('ready');
-                        void mobileThemeToggle.offsetWidth;
-                        forceShowToggle();
-                    }, 1800);
+
+                    // Panggil di banyak momen agar perubahan layout apapun tidak bikin salah posisi
+                    requestAnimationFrame(positionToggle);
+                    requestAnimationFrame(() => requestAnimationFrame(positionToggle));
+                    setTimeout(positionToggle, 0);
+                    setTimeout(positionToggle, 30);
+                    setTimeout(positionToggle, 100);
+                    setTimeout(positionToggle, 300);
+                    setTimeout(positionToggle, 600);
+                    setTimeout(positionToggle, 1200);
+                    setTimeout(positionToggle, 2000);
+                    setTimeout(positionToggle, 3500); // setelah guard page-loading lepas
+
+                    // Re-posisi jika viewport berubah: URL bar collapse/expand, rotate, resize
+                    ['resize', 'orientationchange', 'scrollend', 'load'].forEach(evt => {
+                        window.addEventListener(evt, positionToggle, { passive: true });
+                    });
+                    // iOS URL bar berubah saat scroll (tanpa resize), pasang throttled scroll listener juga
+                    let scrollTicking = false;
+                    window.addEventListener('scroll', () => {
+                        if (!scrollTicking) {
+                            window.requestAnimationFrame(() => {
+                                positionToggle();
+                                scrollTicking = false;
+                            });
+                            scrollTicking = true;
+                        }
+                    }, { passive: true });
                 }
 
                 // RIPPLE EFFECT
