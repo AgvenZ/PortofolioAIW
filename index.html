@@ -232,13 +232,9 @@
             transform: translateY(-4px) scale(1.05);
             box-shadow: 0 12px 40px rgba(240, 155, 74, 0.4);
         }
-        @media (max-width: 480px) {
+        @media (max-width: 768px) {
             #back-to-top {
-                width: 44px;
-                height: 44px;
-                font-size: 1rem;
-                bottom: 20px;
-                right: 20px;
+                display: none !important;
             }
         }
 
@@ -614,6 +610,13 @@
             -webkit-tap-highlight-color: transparent;
             user-select: none;
             contain: layout paint style;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateZ(0);
+        }
+        .mobile-theme-toggle.ready {
+            opacity: 1;
+            visibility: visible;
         }
         .mobile-theme-toggle:hover {
             transform: rotate(20deg);
@@ -749,7 +752,7 @@
                 display: none !important;
             }
             .mobile-theme-toggle {
-                display: flex;
+                display: flex !important;
             }
             .mobile-bottom-nav {
                 display: flex;
@@ -1410,6 +1413,9 @@
             mask-composite: exclude;
             animation: spin 8s linear infinite;
             pointer-events: none;
+        }
+        [data-theme="light"] .hero-visual .orb::after {
+            background: conic-gradient(from 0deg, transparent, rgba(59, 155, 215, 0.55), rgba(240, 155, 74, 0.55), transparent);
         }
         @keyframes spin {
             0% {
@@ -2230,11 +2236,17 @@
 
         /* ===== PERBAIKAN MOBILE & KONSISTENSI ===== */
 
-        /* 1. Hero spacing mobile */
+        /* 1. Hero spacing mobile - diturunkan agar tidak rapat ke atas */
+        @media (max-width: 768px) {
+            #hero {
+                padding-top: calc(5rem + env(safe-area-inset-top)) !important;
+                scroll-margin-top: calc(100px + env(safe-area-inset-top)) !important;
+            }
+        }
         @media (max-width: 480px) {
             #hero {
-                padding-top: 2.5rem !important;
-                scroll-margin-top: 90px !important;
+                padding-top: calc(6rem + env(safe-area-inset-top)) !important;
+                scroll-margin-top: calc(110px + env(safe-area-inset-top)) !important;
             }
         }
 
@@ -2900,6 +2912,17 @@
                 themeToggle.addEventListener('click', toggleTheme);
                 mobileThemeToggle.addEventListener('click', toggleTheme);
 
+                // MOBILE THEME TOGGLE: trigger .ready agar muncul tanpa scroll
+                if (window.innerWidth <= 768) {
+                    requestAnimationFrame(() => {
+                        mobileThemeToggle.classList.add('ready');
+                        void mobileThemeToggle.offsetWidth;
+                    });
+                    setTimeout(() => {
+                        mobileThemeToggle.classList.add('ready');
+                    }, 50);
+                }
+
                 // RIPPLE EFFECT
                 document.querySelectorAll('.btn-primary, .contact-btn, .btn-download').forEach(btn => {
                     btn.addEventListener('click', function(e) {
@@ -2983,7 +3006,7 @@
                         if (isLight) {
                             color1 = '240, 155, 74';
                             color2 = '200, 130, 60';
-                            alpha = this.opacity * 0.9;
+                            alpha = this.opacity * 1.6;
                         } else {
                             color1 = '77, 184, 255';
                             color2 = '240, 155, 74';
@@ -2991,12 +3014,12 @@
                         }
 
                         const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, pulseSize * 3);
-                        gradient.addColorStop(0, `rgba(${color1}, ${alpha * 0.9})`);
-                        gradient.addColorStop(0.5, `rgba(${color1}, ${alpha * 0.5})`);
-                        gradient.addColorStop(1, `rgba(${color2}, ${alpha * 0.15})`);
+                        gradient.addColorStop(0, `rgba(${color1}, ${Math.min(alpha * 0.95, 1)})`);
+                        gradient.addColorStop(0.5, `rgba(${color1}, ${Math.min(alpha * 0.6, 1)})`);
+                        gradient.addColorStop(1, `rgba(${color2}, ${Math.min(alpha * 0.25, 1)})`);
                         ctx.fillStyle = gradient;
-                        ctx.shadowColor = isLight ? `rgba(240,155,74,0.2)` : `rgba(77,184,255,0.1)`;
-                        ctx.shadowBlur = particlesIsMobile ? 8 : 20;
+                        ctx.shadowColor = isLight ? `rgba(240,155,74,0.45)` : `rgba(77,184,255,0.1)`;
+                        ctx.shadowBlur = particlesIsMobile ? 10 : 25;
                         ctx.fill();
                         ctx.shadowBlur = 0;
                     }
@@ -3014,13 +3037,13 @@
                             const dy = particles[i].y - particles[j].y;
                             const dist = Math.sqrt(dx * dx + dy * dy);
                             if (dist < 150) {
-                                const opacity = (1 - dist / 150) * (isLight ? 0.12 : 0.1);
+                                const opacity = (1 - dist / 150) * (isLight ? 0.28 : 0.1);
                                 ctx.beginPath();
                                 ctx.moveTo(particles[i].x, particles[i].y);
                                 ctx.lineTo(particles[j].x, particles[j].y);
                                 const lineColor = isLight ? '240, 155, 74' : '77, 184, 255';
                                 ctx.strokeStyle = `rgba(${lineColor}, ${opacity})`;
-                                ctx.lineWidth = isLight ? 0.8 : 0.6;
+                                ctx.lineWidth = isLight ? 1.1 : 0.6;
                                 ctx.stroke();
                             }
                         }
