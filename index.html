@@ -1953,6 +1953,22 @@
             color: var(--text-primary);
             gap: 0.4rem;
         }
+        .p-title-link {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .p-title-link:hover {
+            color: var(--gradient-end);
+            transform: translateX(2px);
+            filter: drop-shadow(0 2px 6px rgba(240, 155, 74, 0.25));
+        }
+        .p-title-link:active {
+            transform: translateX(0) scale(0.98);
+        }
         .project-card .p-title span:last-child {
             font-weight: 400;
             color: var(--text-muted);
@@ -2572,17 +2588,43 @@
                 <div class="grid-2">
                     <div class="project-card glass-light reveal-left" style="transition-delay:0.1s;">
                         <div class="p-title">
-                            <span><i class="fas fa-globe" style="color:#4db8ff; margin-right:8px;"></i> TAPEM</span>
+                            <a href="https://devtapem.semarangkota.go.id/" target="_blank" rel="noopener noreferrer" class="p-title-link">
+                                <i class="fas fa-globe" style="color:#4db8ff; margin-right:8px;"></i> TAPEM
+                                <i class="fas fa-arrow-up-right-from-square" style="font-size:0.8rem; margin-left:8px; opacity:0.7;"></i>
+                            </a>
                             <span>2025</span>
                         </div>
                         <p>Web platform for accessible public services &amp; information, focused on usability and efficiency.</p>
                     </div>
                     <div class="project-card glass-light reveal-right" style="transition-delay:0.2s;">
                         <div class="p-title">
-                            <span><i class="fas fa-gamepad" style="color:#f09b4a; margin-right:8px;"></i> Farmer's Journey</span>
+                            <a href="https://twenty-studio.itch.io/farmers-journey" target="_blank" rel="noopener noreferrer" class="p-title-link">
+                                <i class="fas fa-gamepad" style="color:#f09b4a; margin-right:8px;"></i> Farmer's Journey
+                                <i class="fas fa-arrow-up-right-from-square" style="font-size:0.8rem; margin-left:8px; opacity:0.7;"></i>
+                            </a>
                             <span>2024</span>
                         </div>
                         <p>3D action game focused on combat, resource collection, and house upgrade mechanics.</p>
+                    </div>
+                    <div class="project-card glass-light reveal-left" style="transition-delay:0.3s;">
+                        <div class="p-title">
+                            <a href="https://i-masjid-hub.vercel.app/" target="_blank" rel="noopener noreferrer" class="p-title-link">
+                                <i class="fas fa-mosque" style="color:#22c55e; margin-right:8px;"></i> iMasjidHub
+                                <i class="fas fa-arrow-up-right-from-square" style="font-size:0.8rem; margin-left:8px; opacity:0.7;"></i>
+                            </a>
+                            <span>2025</span>
+                        </div>
+                        <p>Modern web platform for managing mosque inventory, financial records, and daily activities.</p>
+                    </div>
+                    <div class="project-card glass-light reveal-right" style="transition-delay:0.4s;">
+                        <div class="p-title">
+                            <a href="https://umkm-juron.vercel.app/" target="_blank" rel="noopener noreferrer" class="p-title-link">
+                                <i class="fas fa-store" style="color:#f59e0b; margin-right:8px;"></i> UMKM Juron
+                                <i class="fas fa-arrow-up-right-from-square" style="font-size:0.8rem; margin-left:8px; opacity:0.7;"></i>
+                            </a>
+                            <span>2025</span>
+                        </div>
+                        <p>Web platform for promoting local products and supporting digital marketing for UMKM in Juron Village.</p>
                     </div>
                 </div>
             </section>
