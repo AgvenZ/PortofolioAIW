@@ -1152,13 +1152,14 @@
                 max-width: 100%;
                 text-align: center;
                 min-height: 1.8rem;
-                margin: 0.5rem 0 1.2rem;
+                margin: 1.2rem 0 1.2rem;
             }
         }
         @media (max-width: 480px) {
             .hero-content .tagline {
                 font-size: 0.95rem;
                 min-height: 1.6rem;
+                margin: 1rem 0 1rem;
             }
         }
 
@@ -2014,16 +2015,31 @@
         }
         @media (max-width: 768px) {
             .project-card {
-                padding: 1.5rem 1.8rem;
+                padding: 1.3rem 1.5rem;
                 border-radius: var(--radius-sm);
+                position: relative;
+                min-height: 120px;
             }
             .project-card .p-title {
-                font-size: 0.95rem;
+                font-size: 0.9rem;
                 align-items: flex-start;
+                flex-direction: column;
+                gap: 0.5rem;
+                padding-right: 4.2rem;
+                min-height: 30px;
+            }
+            .project-card .p-title a {
+                line-height: 1.4;
+                word-break: break-word;
             }
             .project-card .p-title span:last-child {
-                font-size: 0.7rem;
+                position: absolute;
+                top: 1.3rem;
+                right: 1.5rem;
+                font-size: 0.72rem;
                 padding: 0.2rem 0.7rem;
+                margin: 0;
+                line-height: 1.2;
             }
             .project-card p {
                 font-size: 0.85rem;
@@ -2032,26 +2048,51 @@
         }
         @media (max-width: 480px) {
             .project-card {
-                padding: 1rem 1.2rem;
+                padding: 1.05rem 1.2rem 1.1rem;
                 border-radius: 1rem;
+                position: relative;
+                min-height: 110px;
             }
             .project-card .p-title {
-                font-size: 0.82rem;
-                flex-direction: row;
+                font-size: 0.78rem;
+                flex-direction: column;
                 align-items: flex-start;
-                gap: 0.5rem;
+                gap: 0.45rem;
+                padding-right: 3.8rem;
+                min-height: 28px;
+            }
+            .project-card .p-title a {
+                line-height: 1.35;
+                word-break: break-word;
             }
             .project-card .p-title span:last-child {
+                position: absolute;
+                top: 1.05rem;
+                right: 1.2rem;
                 font-size: 0.65rem;
-                padding: 0.2rem 0.6rem;
-                margin-left: auto;
-                flex-shrink: 0;
-                margin-top: 0.05rem;
+                padding: 0.18rem 0.6rem;
+                margin: 0;
+                line-height: 1.2;
             }
             .project-card p {
                 font-size: 0.78rem;
-                line-height: 1.5;
-                margin-top: 0.2rem;
+                line-height: 1.55;
+                margin-top: 0.25rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .project-card:has(.p-title a[href*="alzheimers"]) {
+                min-height: 130px;
+            }
+            .project-card:has(.p-title a[href*="alzheimers"]) .p-title {
+                padding-right: 4.8rem;
+            }
+            .project-card:has(.p-title a[href*="alzheimers"]) .p-title a {
+                font-size: 0.74rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: 1.3;
             }
         }
 
@@ -2979,8 +3020,8 @@
                 const textEl = document.getElementById('typewriter-text');
                 const texts = [
                     'Fresh Graduate in Informatics Engineering',
-                    'Machine Learning · Data Analysis · Python · SQL',
-                    'Full Stack Developer · Vue.js · Laravel'
+                    'Data & Machine Learning Enthusiast',
+                    'Full Stack Web Developer'
                 ];
                 let textIndex = 0,
                     charIndex = 0,
